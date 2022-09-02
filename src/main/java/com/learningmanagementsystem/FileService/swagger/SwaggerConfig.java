@@ -28,10 +28,10 @@ public class SwaggerConfig {
     private ApiInfo apiInfo(){
         return new ApiInfo(
                 "File Storage Service",
-                "File Storage Service REST API Documentation",
+                "File Storage Service REST API for managing files and directories in an application",
                 "1",
                 "Terms of service",
-                new Contact("Suh Edmond", "www.website.net", "suhedmond25@yahoo.com"),
+                new Contact("Suh Edmond", "", "suhedmond25@yahoo.com"),
                 "License of API",
                 "API license URL",
                 Collections.emptyList()
