@@ -11,35 +11,33 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class FileServiceImpl implements  FileService{
-
     private final String baseDir = "uploads";
-    private final String basePath = "/api/v1/protected/downloadFile";
 
     @Override
-    public void saveFile(MultipartFile file, String courseName, String fileCategory) {
-        String  finalCourseName = courseName.replaceAll(" ", "");
-        Path courseUploadDir = Paths.get(this.baseDir + "/" + fileCategory +  "/" + finalCourseName ).normalize();
-        if(!Files.exists(courseUploadDir)){
+    public void saveFile(MultipartFile file, String directory, String fileCategory) {
+        String  finalDirectory = directory.replaceAll(" ", "");
+        Path uploadDir = Paths.get(this.baseDir + "/" + fileCategory +  "/" + finalDirectory ).normalize();
+        if(!Files.exists(uploadDir)){
             try {
-                Files.createDirectories(courseUploadDir);
+                Files.createDirectories(uploadDir);
             }catch (IOException e) {
                 throw  new CustomIOException("could not create folder to store the file");
             }
         }
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         if(fileName.contains("..")){
             throw new FileStorageException("File contains invalid character");
         }
-        Path targetLocation = courseUploadDir.resolve(fileName);
+        Path targetLocation = uploadDir.resolve(fileName);
         try {
            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -48,14 +46,16 @@ public class FileServiceImpl implements  FileService{
     }
 
     @Override
-    public UploadFileResponse getCourseMaterial(String courseName, String fileName, String fileCategory) {
+    public UploadFileResponse getFile(String courseName, String fileName, String fileCategory) {
         UploadFileResponse uploadFileResponse = new UploadFileResponse();
-        String originalCourseName = courseName.replaceAll(" ", "");
+        String originalDirName = courseName.replaceAll(" ", "");
+        String basePath = "/api/v1/protected/downloadFile";
         String downloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(this.basePath).queryParam("courseName", originalCourseName).
+                .path(basePath).queryParam("directory", originalDirName).
                  queryParam("fileName", fileName).
                  queryParam("fileCategory", fileCategory).toUriString();
-        Path filePath = Paths.get(this.baseDir + "/" + fileCategory + "/" +originalCourseName).resolve(fileName).normalize();
+        Path filePath = Paths.get(this.baseDir + "/" + fileCategory + "/" +originalDirName).resolve(fileName).normalize();
+
         if(!Files.exists(filePath)){
             throw  new ResourceNotFoundException("File does not exist");
         }
@@ -71,8 +71,8 @@ public class FileServiceImpl implements  FileService{
     }
 
     @Override
-    public List<UploadFileResponse> getCourseMaterials(String courseName, String fileCategory) {
-        String finalCourseName = courseName.replaceAll(" ", "");
+    public List<UploadFileResponse> getFiles(String directory, String fileCategory) {
+        String finalCourseName = directory.replaceAll(" ", "");
         Path directoryPath = Paths.get(this.baseDir + "/" + fileCategory + "/" + finalCourseName).normalize();
         List<UploadFileResponse> uploadFileResponses = new ArrayList<>();
         if(Files.exists(directoryPath)){
@@ -82,42 +82,43 @@ public class FileServiceImpl implements  FileService{
                     String[] splitPath = path.toString().split("/");
                     int splitPathLength = splitPath.length;
                     String fileName = splitPath[splitPathLength-1];
-                    UploadFileResponse response = this.getCourseMaterial(courseName, fileName, fileCategory);
+                    UploadFileResponse response = this.getFile(directory, fileName, fileCategory);
                     uploadFileResponses.add(response);
                 }
             } catch (IOException e) {
-                throw new CustomIOException("Could not locate course directory path");
+                throw new CustomIOException("Could not locate directory path");
             }
         }
         return uploadFileResponses;
     }
 
     @Override
-    public Resource loadFileAsResource(String courseName, String fileCategory, String fileName) {
-        String originalCourseName = courseName.replaceAll(" ", "");
-        Path path = Paths.get(this.baseDir + "/" + fileCategory + "/" + originalCourseName).
+    public Resource loadFileAsResource(String directory, String fileCategory, String fileName) {
+        String originalDirName = directory.replaceAll(" ", "");
+        Resource resource;
+
+        Path path = Paths.get(this.baseDir + "/" + fileCategory + "/" + originalDirName).
                 resolve(fileName).normalize();
         if(!Files.exists(path)){
             throw new ResourceNotFoundException("File does not exist");
         }
-        Resource resource = null;
         try {
             resource = new UrlResource(path.toUri());
         } catch (MalformedURLException e) {
             throw new FileStorageException("File path is invalid");
         }
         if(resource.exists()){
-                return resource;
-            }else {
-                throw new ResourceNotFoundException("File not found"+ fileName);
-            }
+            return resource;
+        }else {
+            throw new ResourceNotFoundException("File not found"+ fileName);
+        }
 
     }
 
     @Override
-    public void deleteFile(String courseName, String fileName, String fileCategory) {
-        String originalCourseName = courseName.replaceAll(" ", "");
-        Path  path = Paths.get(this.baseDir + "/" + fileCategory + "/" + originalCourseName ).resolve(fileName).normalize();
+    public void deleteFile(String directory, String fileName, String fileCategory) {
+        String originalDirName = directory.replaceAll(" ", "");
+        Path  path = Paths.get(this.baseDir + "/" + fileCategory + "/" + originalDirName ).resolve(fileName).normalize();
         try {
             Files.delete(path);
         } catch (IOException e) {
@@ -126,9 +127,9 @@ public class FileServiceImpl implements  FileService{
     }
 
     @Override
-    public void deleteDirectory(String courseName, String fileCategory) {
-        String originalCourseName = courseName.replaceAll(" ", "");
-        Path path = Paths.get(this.baseDir + "/" + fileCategory).resolve(originalCourseName).normalize();
+    public void deleteDirectory(String directory, String fileCategory) {
+        String originalDirName = directory.replaceAll(" ", "");
+        Path path = Paths.get(this.baseDir + "/" + fileCategory).resolve(originalDirName).normalize();
         try {
             Files.delete(path);
         } catch (IOException e) {

@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface FileService {
 
-    public void saveFile(MultipartFile file, String courseName, String fileCategory);
-    public UploadFileResponse getCourseMaterial(String courseName, String fileName, String fileCategory);
-    public List<UploadFileResponse> getCourseMaterials(String courseName, String fileCategory);
-    public Resource loadFileAsResource(String courseName, String fileCategory, String fileName);
-    public void deleteFile(String courseName, String fileName, String fileCategory);
-    public void deleteDirectory(String courseName, String fileCategory);
+    void saveFile(MultipartFile file, String directory, String fileCategory);
+    UploadFileResponse getFile(String directory, String fileName, String fileCategory);
+    List<UploadFileResponse> getFiles(String directory, String fileCategory);
+    Resource loadFileAsResource(String directory, String fileCategory, String fileName);
+    void deleteFile(String directory, String fileName, String fileCategory);
+    void deleteDirectory(String directory, String fileCategory);
 
 }
