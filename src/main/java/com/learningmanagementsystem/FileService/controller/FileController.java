@@ -24,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/protected/")
 @RequiredArgsConstructor
+@CrossOrigin
 public class FileController {
 
     private final FileService fileService;
@@ -38,7 +39,7 @@ public class FileController {
     }
 
     @GetMapping(path = "downloadFile")
-    @ApiOperation("Upload a files to a directory")
+    @ApiOperation("download a file from a directory")
     public ResponseEntity<?> downloadFile(@RequestParam("fileName") String fileName,
                                           @RequestParam("directory") String directory,
                                           @RequestParam("fileCategory") FileCategory fileCategory, HttpServletRequest httpServletRequest){
