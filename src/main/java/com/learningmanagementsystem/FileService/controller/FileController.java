@@ -30,12 +30,12 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping(path ="upload-file")
-    public ResponseEntity<MessageResponse> uploadFiles(@RequestParam("directory") String directory,
+    public ResponseEntity<UploadFileResponse> uploadFiles(@RequestParam("directory") String directory,
                                                            @RequestParam("fileCategory") FileCategory fileCategory,
                                                            @RequestPart(value = "file") MultipartFile multipartFile){
 
-        this.fileService.saveFile(multipartFile, directory, fileCategory.toString());
-        return new ResponseEntity<>(new MessageResponse("success", "File uploaded successfully",new Date()), HttpStatus.OK);
+        UploadFileResponse response = this.fileService.saveFile(multipartFile, directory, fileCategory.toString());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(path = "downloadFile")

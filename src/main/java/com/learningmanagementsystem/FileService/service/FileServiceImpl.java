@@ -23,7 +23,7 @@ public class FileServiceImpl implements  FileService{
     private final String baseDir = "uploads";
 
     @Override
-    public void saveFile(MultipartFile file, String directory, String fileCategory) {
+    public UploadFileResponse saveFile(MultipartFile file, String directory, String fileCategory) {
         String  finalDirectory = directory.replaceAll(" ", "");
         Path uploadDir = Paths.get(this.baseDir + "/" + fileCategory +  "/" + finalDirectory ).normalize();
         if(!Files.exists(uploadDir)){
@@ -43,6 +43,8 @@ public class FileServiceImpl implements  FileService{
         } catch (IOException e) {
            throw new FileStorageException("Could not upload file");
         }
+
+        return getFile(directory, fileName, fileCategory);
     }
 
     @Override

@@ -8,11 +8,16 @@ import java.util.List;
 
 public interface FileService {
 
-    void saveFile(MultipartFile file, String directory, String fileCategory);
+    UploadFileResponse saveFile(MultipartFile file, String directory, String fileCategory);
+
     UploadFileResponse getFile(String directory, String fileName, String fileCategory);
+
     List<UploadFileResponse> getFiles(String directory, String fileCategory);
+
     Resource loadFileAsResource(String directory, String fileCategory, String fileName);
+
     void deleteFile(String directory, String fileName, String fileCategory);
+
     void deleteDirectory(String directory, String fileCategory);
 
 }
