@@ -3,7 +3,6 @@ package com.learningmanagementsystem.FileService.controller;
 
 import com.learningmanagementsystem.FileService.exception.FileStorageException;
 import com.learningmanagementsystem.FileService.model.FileCategory;
-import com.learningmanagementsystem.FileService.model.MessageResponse;
 import com.learningmanagementsystem.FileService.model.UploadFileResponse;
 import com.learningmanagementsystem.FileService.service.FileService;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 @RestController

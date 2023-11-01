@@ -17,7 +17,7 @@ import java.util.*;
 public class SwaggerConfig {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final Set<String> PRODUCES = new HashSet<String>(Arrays.asList("application/json"));
+    private static final Set<String> PRODUCES = new HashSet<>(Collections.singletonList("application/json"));
 
     private ApiKey apiKey(){
         return new ApiKey("JWT", AUTHORIZATION_HEADER, "header");
@@ -42,8 +42,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .produces(PRODUCES)
-                .securityContexts(Arrays.asList(securityContext()))
-                .securitySchemes(Arrays.asList(apiKey()))
+                .securityContexts(Collections.singletonList(securityContext()))
+                .securitySchemes(Collections.singletonList(apiKey()))
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.learningmanagementsystem.FileService"))
                 .paths(PathSelectors.any())
@@ -58,6 +58,6 @@ public class SwaggerConfig {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Arrays.asList(new SecurityReference("JWT", authorizationScopes));
+        return Collections.singletonList(new SecurityReference("JWT", authorizationScopes));
     }
 }
